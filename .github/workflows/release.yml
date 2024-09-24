@@ -1,0 +1,101 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+
+  build-gnu-linux:
+    name: Release
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        os:
+          - windows
+          - linux
+          - darwin
+        arch:
+          - amd64
+          - arm64
+        include:
+          - os: windows
+            arch: 386
+          - os: windows
+            arch: arm
+            arm: 7
+          - os: linux
+            arch: arm
+            arm: 7
+          - os: linux
+            arch: arm
+            arm: 6
+          - os: linux
+            arch: arm
+            arm: 5
+          - os: linux
+            arch: 386
+          - os: linux
+            arch: loong64
+          - os: linux
+            arch: mips
+          - os: linux
+            arch: mips64
+          - os: linux
+            arch: mips64le
+          - os: linux
+            arch: mipsle
+          - os: linux
+            arch: ppc64
+          - os: linux
+            arch: ppc64le
+          - os: linux
+            arch: riscv64
+          - os: linux
+            arch: s390x
+    runs-on: ubuntu-latest
+    env:
+      GOOS: ${{ matrix.os }}
+      GOARCH: ${{ matrix.arch }}
+      GOARM: ${{ matrix.arm }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23.1'
+
+      - name: Build
+        run: |
+          if [ -n "$GOARM" ]; then
+              export ARCH_NAME=arm-v"$GOARM"
+          else
+              export ARCH_NAME="$GOARCH"
+          fi
+
+          if [ "$GOOS" = "windows" ]; then
+              export FILES='md4.exe md5.exe sha1.exe sha224.exe sha256.exe sha384.exe sha512.exe ripemd160.exe sha3-224.exe sha3-256.exe sha3-384.exe sha3-512.exe sha512-224.exe sha512-256.exe blake2s-128.exe blake2s-256.exe blake2b-256.exe blake2b-384.exe blake2b-512.exe sm3.exe'
+          else
+              export FILES='md4 md5 sha1 sha224 sha256 sha384 sha512 ripemd160 sha3-224 sha3-256 sha3-384 sha3-512 sha512-224 sha512-256 blake2s-128 blake2s-256 blake2b-256 blake2b-384 blake2b-512 sm3'
+          fi
+          
+          go build -o digest-go
+          for file in $FILES; do
+              cp digest-go "$file""$FILE_EXT"
+          done
+          mkdir release-assets/
+          if [ "$GOOS" = "windows" ]; then
+              zip release-assets/digest-go-windows-$ARCH_NAME.zip $FILES LICENSE NOTICE    
+          else
+              tar -zcf release-assets/digest-go-$GOOS-$ARCH_NAME.tar.gz $FILES LICENSE NOTICE
+          fi
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
