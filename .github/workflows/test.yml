@@ -1,0 +1,66 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go release
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+
+  build-unix:
+    name: Test | Unix
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        os:
+          - ubuntu
+          - macos
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23.1'
+
+      - name: Build
+        run: |
+          go build -o blake2b-256
+          echo 'Test file' > test-file.txt
+          output=$(./blake2b-256 test-file.txt)
+          echo "$output"
+          if ["$output" != '1e3a1fe6665bf7371d8c5560d5e44f5a80a0239176d19c64d9917072bbe6d5a2 test-file.txt']; then
+              echo 'Output is incorrect'
+              exit 125
+          fi
+
+  test-windows:
+    name: Test | Windows
+    permissions:
+      contents: read
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23.1'
+
+      - name: Build
+        run: |
+          go build -o blake2b-256.exe
+          echo 'Test file' > test-file.txt
+          $output = .\blake2b-256.exe test-file.txt
+          if ("$output" -ne 'expected_output=1e3a1fe6665bf7371d8c5560d5e44f5a80a0239176d19c64d9917072bbe6d5a2 test-file.txt') {
+              Write-Output 'Output is incorrect'
+              exit 125
+          }
