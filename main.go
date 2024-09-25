@@ -128,5 +128,5 @@ func sum(path string, f *os.File) {
             _, _ = algorithm.Write(buffer[:n])
         }
     }
-    fmt.Println(path, hex.EncodeToString(algorithm.Sum(nil)))
+    fmt.Println(hex.EncodeToString(algorithm.Sum(nil)), path)
 }
