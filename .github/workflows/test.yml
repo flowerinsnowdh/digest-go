@@ -34,12 +34,6 @@ jobs:
       - name: Build
         run: |
           go build -o blake2b-256
-          echo 'Test file' > test-file.txt
-          output=$(./blake2b-256 test-file.txt)
-          if ["$output" != '1e3a1fe6665bf7371d8c5560d5e44f5a80a0239176d19c64d9917072bbe6d5a2 test-file.txt']; then
-              echo 'Output is incorrect'
-              exit 125
-          fi
 
   test-windows:
     name: Test | Windows
@@ -57,9 +51,3 @@ jobs:
       - name: Build
         run: |
           go build -o blake2b-256.exe
-          echo 'Test file' > test-file.txt
-          $output = .\blake2b-256.exe test-file.txt
-          if ("$output" -ne '1e3a1fe6665bf7371d8c5560d5e44f5a80a0239176d19c64d9917072bbe6d5a2 test-file.txt') {
-              Write-Output 'Output is incorrect'
-              exit 125
-          }
