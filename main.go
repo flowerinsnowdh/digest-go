@@ -22,6 +22,7 @@ import (
     "hash"
     "io"
     "os"
+    "path"
     "strings"
 )
 
@@ -30,6 +31,10 @@ var paths []string
 
 func init() {
     algorithm = func() hash.Hash {
+        var simple = path.Base(strings.ToLower(os.Args[0]))
+        var ext = path.Ext(simple)
+        simple = strings.TrimSuffix(simple, ext)
+
         switch strings.ToLower(os.Args[0]) {
         case "md4":
             return md4.New()
