@@ -35,7 +35,7 @@ func init() {
         var ext = path.Ext(simple)
         simple = strings.TrimSuffix(simple, ext)
 
-        switch strings.ToLower(os.Args[0]) {
+        switch simple {
         case "md4":
             return md4.New()
         case "md5":
