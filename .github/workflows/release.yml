@@ -74,15 +74,19 @@ jobs:
       - name: Build
         run: |
           if [ -n "$GOARM" ]; then
-              export ARCH_NAME=arm-v"$GOARM"
+              ARCH_NAME=arm-v"$GOARM"
+          elif [ "$GOARCH" = '386' ]; then
+              ARCH_NAME='x86'
+          elif [ "$GOARCH" = 'amd64' ]
+              ARCH_NAME='x86_64'
           else
-              export ARCH_NAME="$GOARCH"
+              ARCH_NAME="$GOARCH"
           fi
 
           if [ "$GOOS" = "windows" ]; then
-              export FILES='md4.exe md5.exe sha1.exe sha224.exe sha256.exe sha384.exe sha512.exe ripemd160.exe sha3-224.exe sha3-256.exe sha3-384.exe sha3-512.exe sha512-224.exe sha512-256.exe blake2s-128.exe blake2s-256.exe blake2b-256.exe blake2b-384.exe blake2b-512.exe sm3.exe'
+              FILES='md4.exe md5.exe sha1.exe sha224.exe sha256.exe sha384.exe sha512.exe ripemd160.exe sha3-224.exe sha3-256.exe sha3-384.exe sha3-512.exe sha512-224.exe sha512-256.exe blake2s-128.exe blake2s-256.exe blake2b-256.exe blake2b-384.exe blake2b-512.exe sm3.exe'
           else
-              export FILES='md4 md5 sha1 sha224 sha256 sha384 sha512 ripemd160 sha3-224 sha3-256 sha3-384 sha3-512 sha512-224 sha512-256 blake2s-128 blake2s-256 blake2b-256 blake2b-384 blake2b-512 sm3'
+              FILES='md4 md5 sha1 sha224 sha256 sha384 sha512 ripemd160 sha3-224 sha3-256 sha3-384 sha3-512 sha512-224 sha512-256 blake2s-128 blake2s-256 blake2b-256 blake2b-384 blake2b-512 sm3'
           fi
           
           go build -o digest-go
