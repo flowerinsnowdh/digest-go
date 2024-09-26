@@ -10,7 +10,7 @@ on:
 
 jobs:
 
-  build-gnu-linux:
+  build:
     name: Release
     permissions:
       contents: write
@@ -87,7 +87,7 @@ jobs:
           
           go build -o digest-go
           for file in $FILES; do
-              cp digest-go "$file""$FILE_EXT"
+              cp digest-go "$file"
           done
           mkdir release-assets/
           if [ "$GOOS" = "windows" ]; then
